@@ -1,0 +1,30 @@
+{
+	"format_version": 2,
+	"header": {
+		"name": "More than Feathers",
+		"description": "TypeScript Starter",
+		"uuid": "250dc380-4bab-4a32-b40d-3abcf1528e54",
+		"version": [1, 0, 0],
+		"min_engine_version": [1, 21, 80]
+	},
+	"modules": [
+		{
+			"description": "My Resource Pack",
+			"type": "resources",
+			"uuid": "7a6eb598-5cc3-49a8-a89f-3dd801aec650",
+			"version": [1, 0, 0]
+		}
+	],
+	"dependencies": [
+		{
+			"uuid": "7fb659e3-4a30-42af-9dd5-7f0307ff71cb",
+			"version": [1, 0, 0]
+		}
+	],
+	"metadata": {
+		"generated_with": {
+			"mctoolsweb": ["0.11.1"],
+			"blockbench_entity_wizard": ["1.7.0"]
+		}
+	}
+}
