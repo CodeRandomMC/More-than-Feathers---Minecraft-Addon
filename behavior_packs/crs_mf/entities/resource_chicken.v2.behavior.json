@@ -39,7 +39,8 @@
               },
               "min_wait_time": 300,
               "max_wait_time": 600,
-              "spawn_item": "minecraft:egg"
+              "spawn_item": "minecraft:egg",
+              "spawn_sound": "plop"
             },
             {
               "filters": {
@@ -48,7 +49,8 @@
               },
               "min_wait_time": 300,
               "max_wait_time": 600,
-              "spawn_item": "minecraft:stone"
+              "spawn_item": "minecraft:stone",
+              "spawn_sound": "plop"
             }
           ]
         },
