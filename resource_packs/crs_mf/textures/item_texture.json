@@ -1,0 +1,16 @@
+{
+  "resource_pack_name": "more_than_feathers",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "crs_mf:chicken_feed": {
+      "textures": {
+        "path": "textures/items/chicken_feed"
+      }
+    },
+    "crs_mf:stone_feed": {
+      "textures": {
+        "path": "textures/items/stone_feed"
+      }
+    }
+  }
+}

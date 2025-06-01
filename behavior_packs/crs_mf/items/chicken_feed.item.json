@@ -1,0 +1,14 @@
+{
+  "format_version": "1.20.41",
+  "minecraft:item": {
+    "description": {
+      "identifier": "crs_mf:chicken_feed",
+      "menu_category": {
+        "category": "items"
+      }
+    },
+    "components": {
+      "minecraft:icon": "crs_mf:chicken_feed"
+    }
+  }
+}

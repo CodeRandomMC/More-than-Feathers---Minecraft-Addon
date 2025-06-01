@@ -22,7 +22,7 @@
         },
         "minecraft:ageable": {
           "duration": 1200,
-          "feed_items": "minecraft:wheat_seeds",
+          "feed_items": "crs_mf:chicken_feed",
           "grow_up": {
             "event": "crs_mf:age_up",
             "target": "self"
@@ -38,7 +38,7 @@
                 "filters": {
                   "all_of": [
                     { "test": "is_family", "subject": "other", "value": "player" },
-                    { "test": "has_equipment", "subject": "other", "domain": "hand", "value": "minecraft:stone" }
+                    { "test": "has_equipment", "subject": "other", "domain": "hand", "value": "crs_mf:stone_feed" }
                   ]
                 },
                 "event": "crs_mf:transform_to_stone",
@@ -79,6 +79,14 @@
       },
       "crs_mf:transform_to_stone": {
         "sequence": [
+          {
+            "emit_particle": {
+              "particle": "minecraft:critical_hit_emitter"
+            },
+            "play_sound": {
+              "sound": "minecraft:mob.chicken.cluck"
+            }
+          },
           {
             "remove": {
               "component_groups": ["crs_mf:base_variant"]
