@@ -1,0 +1,126 @@
+{
+  "format_version": "1.21.82",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "crs_mf:resource_chicken",
+      "is_spawnable": true,
+      "is_summonable": true,
+      "properties": {
+        "crs_mf:saturation": {
+          "type": "int",
+          "range": [0, 100],
+          "default": 50,
+          "client_sync": true
+        }
+      }
+    },
+    "component_groups": {
+      "crs_mf:resource_chicken_baby": {
+        "minecraft:is_baby": {},
+        "minecraft:scale": {
+          "value": 0.5
+        },
+        "minecraft:ageable": {
+          "duration": 1200,
+          "feed_items": "minecraft:wheat_seeds",
+          "grow_up": {
+            "event": "crs_mf:age_up",
+            "target": "self"
+          }
+        }
+      },
+      "crs_mf:resource_chicken_adult": {
+        "minecraft:interact": {
+          "interactions": [
+            {
+              "use_item": true,
+              "on_interact": {
+                "filters": {
+                  "all_of": [
+                    { "test": "is_family", "subject": "other", "value": "player" },
+                    { "test": "has_equipment", "subject": "other", "domain": "hand", "value": "minecraft:stone" }
+                  ]
+                },
+                "event": "crs_mf:transform_to_stone",
+                "target": "self"
+              }
+            }
+          ]
+        }
+      },
+      "crs_mf:base_variant": {
+        "minecraft:variant": {
+          "value": 0
+        }
+      },
+      "crs_mf:stone_variant": {
+        "minecraft:variant": {
+          "value": 1
+        }
+      }
+    },
+    "components": {
+      "minecraft:physics": {}
+    },
+    "events": {
+      "crs_mf:age_up": {
+        "sequence": [
+          {
+            "remove": {
+              "component_groups": ["crs_mf:resource_chicken_baby"]
+            }
+          },
+          {
+            "add": {
+              "component_groups": ["crs_mf:resource_chicken_adult"]
+            }
+          }
+        ]
+      },
+      "crs_mf:transform_to_stone": {
+        "sequence": [
+          {
+            "remove": {
+              "component_groups": ["crs_mf:base_variant"]
+            }
+          },
+          {
+            "add": {
+              "component_groups": ["crs_mf:stone_variant"]
+            }
+          }
+        ]
+      },
+      "minecraft:entity_spawned": {
+        "sequence": [
+          {
+            "add": {
+              "component_groups": ["crs_mf:base_variant"]
+            }
+          },
+          {
+            "randomize": [
+              {
+                "weight": 1,
+                "add": {
+                  "component_groups": ["crs_mf:resource_chicken_baby"]
+                }
+              },
+              {
+                "weight": 9,
+                "add": {
+                  "component_groups": ["crs_mf:resource_chicken_adult"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "minecraft:entity_born": {
+        "add": {
+          "component_groups": ["crs_mf:resource_chicken_baby"]
+        }
+      }
+    }
+  }
+}

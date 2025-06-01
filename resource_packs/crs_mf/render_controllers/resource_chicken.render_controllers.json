@@ -1,0 +1,19 @@
+{
+  "format_version": "1.10.0",
+  "render_controllers": {
+    "controller.render.resource_chicken": {
+      "arrays": {
+        "textures": {
+          "Array.default": ["Texture.base_variant", "Texture.stone_variant"]
+        }
+      },
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "material.default"
+        }
+      ],
+      "textures": ["Array.default[query.variant]"]
+    }
+  }
+}

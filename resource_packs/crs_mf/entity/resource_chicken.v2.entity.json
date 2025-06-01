@@ -9,10 +9,11 @@
         "legs": "chicken_legs"
       },
       "textures": {
-        "default": "textures/entity/resource_chicken"
+        "base_variant": "textures/entity/resource_chicken/base_variant",
+        "stone_variant": "textures/entity/resource_chicken/stone_variant"
       },
       "geometry": {
-        "default": "geometry.chicken"
+        "default": "geometry.resource_chicken"
       },
       "animations": {
         "move": "animation.chicken.move",
@@ -32,9 +33,9 @@
           }
         ]
       },
-      "render_controllers": ["controller.render.chicken"],
+      "render_controllers": ["controller.render.resource_chicken"],
       "spawn_egg": {
-        "base_color": "#00e6ff",
+        "base_color": "#000000",
         "overlay_color": "#00e6ff"
       }
     }
