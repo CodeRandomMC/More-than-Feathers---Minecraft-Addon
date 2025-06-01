@@ -30,6 +30,28 @@
         }
       },
       "crs_mf:resource_chicken_adult": {
+        "minecraft:spawn_entity": {
+          "entities": [
+            {
+              "filters": {
+                "test": "is_variant",
+                "value": 0
+              },
+              "min_wait_time": 300,
+              "max_wait_time": 600,
+              "spawn_item": "minecraft:egg"
+            },
+            {
+              "filters": {
+                "test": "is_variant",
+                "value": 1
+              },
+              "min_wait_time": 300,
+              "max_wait_time": 600,
+              "spawn_item": "minecraft:stone"
+            }
+          ]
+        },
         "minecraft:interact": {
           "interactions": [
             {
@@ -37,6 +59,7 @@
               "on_interact": {
                 "filters": {
                   "all_of": [
+                    { "test": "is_variant", "subject": "self", "value": 0 },
                     { "test": "is_family", "subject": "other", "value": "player" },
                     { "test": "has_equipment", "subject": "other", "domain": "hand", "value": "crs_mf:stone_feed" }
                   ]
