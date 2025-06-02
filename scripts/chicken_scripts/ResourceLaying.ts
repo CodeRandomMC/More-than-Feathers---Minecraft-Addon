@@ -48,59 +48,44 @@ export class ResourceLaying {
       const currentTick = system.currentTick;
 
       for (const [id, { entity }] of ResourceChickens.chickenCache.entries()) {
-        if (entity.typeId !== CONFIG.CHICKEN_TYPE_ID || !entity.isValid) { // v2.0.0 use EntityLifetimeState.loaded as isValid
+        if (entity.typeId !== CONFIG.CHICKEN_TYPE_ID || !entity.isValid) {
           Logger.warn(`Invalid entity type ${entity.typeId} in cache for ID ${id}`);
           continue;
         }
 
+        // Get or initialize nextLayAttempt
         let nextLayAttempt = entity.getDynamicProperty("nextLayAttempt") as number | undefined;
         if (nextLayAttempt === undefined) {
-          Logger.warn(`nextLayAttempt not set for chicken ${id}, initializing`);
           nextLayAttempt = CONFIG.INITIAL_TICKS_UNTIL_LAY;
           entity.setDynamicProperty("nextLayAttempt", nextLayAttempt);
         }
 
-        // Skip if not ready to lay (-1 indicates fresh spawn or not ready)
-        if (nextLayAttempt === CONFIG.INITIAL_TICKS_UNTIL_LAY) {
-          let variant: ChickenVariantType;
-          try {
-            variant = getChickenVariant(entity);
-          } catch (e) {
-            Logger.warn(`Failed to get variant for chicken ${id}: ${e}`);
-            continue;
-          }
-
-          const variantData = ChickenVariants[variant];
-          if (!variantData) {
-            Logger.warn(`Unknown variant ${variant} for chicken ${id}, skipping`);
-            continue;
-          }
-
-          nextLayAttempt = getNextRandomSpawnTick(
-            variantData.minSpawnTick ?? CONFIG.DEFAULT_SPAWN_TICK_RANGE.MIN,
-            variantData.maxSpawnTick ?? CONFIG.DEFAULT_SPAWN_TICK_RANGE.MAX
-          );
-          entity.setDynamicProperty("nextLayAttempt", nextLayAttempt);
-          Logger.debug(`Set nextLayAttempt to ${nextLayAttempt} for chicken ${id}`);
-          continue;
-        }
-
-        if (currentTick < nextLayAttempt) continue;
-
+        // Get variant and variantData early, skip on error
         let variant: ChickenVariantType;
+        let variantData: (typeof ChickenVariants)[keyof typeof ChickenVariants];
         try {
           variant = getChickenVariant(entity);
+          variantData = ChickenVariants[variant];
+          if (!variantData) throw new Error(`Unknown variant ${variant}`);
         } catch (e) {
           Logger.warn(`Failed to get variant for chicken ${id}: ${e}`);
           continue;
         }
 
-        const variantData = ChickenVariants[variant];
-        if (!variantData) {
-          Logger.warn(`Unknown variant ${variant} for chicken ${id}, skipping`);
+        // If just spawned or not ready, schedule next lay attempt
+        if (nextLayAttempt === CONFIG.INITIAL_TICKS_UNTIL_LAY) {
+          const next = getNextRandomSpawnTick(
+            variantData.minSpawnTick ?? CONFIG.DEFAULT_SPAWN_TICK_RANGE.MIN,
+            variantData.maxSpawnTick ?? CONFIG.DEFAULT_SPAWN_TICK_RANGE.MAX
+          );
+          entity.setDynamicProperty("nextLayAttempt", next);
+          Logger.debug(`Set nextLayAttempt to ${next} for chicken ${id}`);
           continue;
         }
 
+        if (currentTick < nextLayAttempt) continue;
+
+        // Lay resource
         const itemId = getWeightedRandomItem(variantData.items);
         const itemStack = new ItemStack(itemId, 1);
 
@@ -117,19 +102,19 @@ export class ResourceLaying {
           continue;
         }
 
-        // Set nextLayAttempt for the next cycle set to -1 if baby chicken
-        if (entity.hasComponent("minecraft:is_baby") === true) {
-          nextLayAttempt = CONFIG.INITIAL_TICKS_UNTIL_LAY;
+        // Set nextLayAttempt for the next cycle; reset if baby
+        const isBaby = !!entity.getComponent?.("minecraft:is_baby");
+        let next;
+        if (isBaby) {
+          next = CONFIG.INITIAL_TICKS_UNTIL_LAY;
         } else {
-          nextLayAttempt = getNextRandomSpawnTick(
+          next = getNextRandomSpawnTick(
             variantData.minSpawnTick ?? CONFIG.DEFAULT_SPAWN_TICK_RANGE.MIN,
             variantData.maxSpawnTick ?? CONFIG.DEFAULT_SPAWN_TICK_RANGE.MAX
           );
         }
-        
-        // Update the dynamic property for next lay attempt
-        entity.setDynamicProperty("nextLayAttempt", nextLayAttempt);
-        Logger.debug(`Updated nextLayAttempt to ${nextLayAttempt} for chicken ${id}`);
+        entity.setDynamicProperty("nextLayAttempt", next);
+        Logger.debug(`Updated nextLayAttempt to ${next} for chicken ${id}`);
       }
     }, 1);
   }
