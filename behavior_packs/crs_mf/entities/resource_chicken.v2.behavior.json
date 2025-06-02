@@ -86,14 +86,6 @@
       "crs_mf:transform_to_stone": {
         "sequence": [
           {
-            "emit_particle": {
-              "particle": "minecraft:critical_hit_emitter"
-            },
-            "play_sound": {
-              "sound": "minecraft:mob.chicken.cluck"
-            }
-          },
-          {
             "remove": {
               "component_groups": ["crs_mf:base_variant"]
             }
