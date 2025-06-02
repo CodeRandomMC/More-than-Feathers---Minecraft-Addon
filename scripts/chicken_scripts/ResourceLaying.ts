@@ -3,6 +3,7 @@ import { ResourceChickens } from "./ResourceChickens";
 import { ChickenVariantType, ItemDrop, getChickenVariant } from "../chicken_data/ChickenData";
 import { Logger } from "../utils/CRSLogger";
 import { ChickenVariants } from "../chicken_data/ChickenVariants";
+import { MinecraftEffectTypes } from "@minecraft/vanilla-data";
 
 /**
  * Selects a random item from the list based on weights.
@@ -72,6 +73,7 @@ export class ResourceLaying {
 
         try {
           entity.dimension.spawnItem(itemStack, entity.location);
+          entity.dimension.spawnParticle("minecraft:crop_growth_emitter", entity.location);
           try {
             entity.dimension.playSound("mob.chicken.plop", entity.location, { volume: 1, pitch: 1 });
           } catch (error) {
