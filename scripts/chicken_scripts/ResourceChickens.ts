@@ -1,6 +1,6 @@
 import { Logger } from "../utils/CRSLogger";
 import { ChickenCacheManager } from "./ChickenCacheManager";
-import { ChickenCacheEntry } from "./ChickenData";
+import { ChickenCacheEntry } from "../chicken_data/ChickenData";
 import { ResourceLaying } from "./ResourceLaying";
 
 /**

@@ -1,7 +1,8 @@
 import { system, ItemStack } from "@minecraft/server";
 import { ResourceChickens } from "./ResourceChickens";
-import { ChickenVariantType, ItemDrop, chickenVariants, getChickenVariant } from "./ChickenData";
+import { ChickenVariantType, ItemDrop, getChickenVariant } from "../chicken_data/ChickenData";
 import { Logger } from "../utils/CRSLogger";
+import { ChickenVariants } from "../chicken_data/ChickenVariants";
 
 /**
  * Selects a random item from the list based on weights.
@@ -60,7 +61,7 @@ export class ResourceLaying {
           continue;
         }
 
-        const variantData = chickenVariants[variant];
+        const variantData = ChickenVariants[variant];
         if (!variantData) {
           Logger.warn(`Unknown variant ${variant} for chicken ${id}, skipping.`);
           continue;
@@ -71,13 +72,17 @@ export class ResourceLaying {
 
         try {
           entity.dimension.spawnItem(itemStack, entity.location);
-          entity.dimension.playSound("plop", entity.location);
+          try {
+            entity.dimension.playSound("mob.chicken.plop", entity.location, { volume: 1, pitch: 1 });
+          } catch (error) {
+            Logger.warn(`Failed to play sound for chicken ${id}: ${error}`);
+          }
         } catch (e) {
           Logger.warn(`Failed to spawn item for chicken ${id}: ${e}`);
           continue;
         }
 
-        entry.nextSpawnTick = getNextRandomSpawnTick(300, 600);
+        entry.nextSpawnTick = getNextRandomSpawnTick(variantData.minSpawnTick ?? 300, variantData.maxSpawnTick ?? 600);
       }
     }, 1);
   }
