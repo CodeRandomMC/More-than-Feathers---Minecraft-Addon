@@ -18,7 +18,6 @@ export interface ChickenVariant {
 
 export interface ChickenCacheEntry {
   entity: Entity;
-  nextSpawnTick: number;
 }
 
 export enum ChickenVariantType {
@@ -42,5 +41,5 @@ export function getChickenVariant(entity: Entity): ChickenVariantType {
 
 export function getChickenVariantData(entity: Entity): ChickenVariant {
   const chickenVariant = getChickenVariant(entity);
-  return ChickenVariants[chickenVariant] || ChickenVariants[ChickenVariantType.Base]; // Fallback to Base if not found
+  return ChickenVariants[chickenVariant] || ChickenVariants[ChickenVariantType.Base];
 }
