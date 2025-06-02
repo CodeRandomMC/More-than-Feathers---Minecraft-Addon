@@ -3,6 +3,7 @@ import { ResourceChickens } from "./ResourceChickens";
 import { ChickenVariantType, ItemDrop, getChickenVariant } from "../chicken_data/ChickenData";
 import { Logger } from "../utils/CRSLogger";
 import { ChickenVariants } from "../chicken_data/ChickenVariants";
+import { getNextRandomSpawnTick } from "../utils/TickUtils";
 
 // Configuration constants
 const CONFIG = {
@@ -30,20 +31,6 @@ function getWeightedRandomItem(items: ItemDrop[]): string {
 }
 
 /**
- * Generates a random spawn tick within the given range.
- * @param min - Minimum ticks before next spawn
- * @param max - Maximum ticks before next spawn
- * @returns The calculated next spawn tick
- * @throws Error if the range is invalid
- */
-function getNextRandomSpawnTick(min: number, max: number): number {
-  if (min < 0 || max < min) {
-    throw new Error(`Invalid spawn tick range: min=${min}, max=${max}`);
-  }
-  return system.currentTick + Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-/**
  * Handles the logic for chickens laying resources, using the static cache from ResourceChickens
  * and dynamic properties on entities.
  */
@@ -66,15 +53,15 @@ export class ResourceLaying {
           continue;
         }
 
-        let ticksUntilNextLay = entity.getDynamicProperty("ticksUntilNextLay") as number | undefined;
-        if (ticksUntilNextLay === undefined) {
-          Logger.warn(`ticksUntilNextLay not set for chicken ${id}, initializing`);
-          ticksUntilNextLay = CONFIG.INITIAL_TICKS_UNTIL_LAY;
-          entity.setDynamicProperty("ticksUntilNextLay", ticksUntilNextLay);
+        let nextLayAttempt = entity.getDynamicProperty("nextLayAttempt") as number | undefined;
+        if (nextLayAttempt === undefined) {
+          Logger.warn(`nextLayAttempt not set for chicken ${id}, initializing`);
+          nextLayAttempt = CONFIG.INITIAL_TICKS_UNTIL_LAY;
+          entity.setDynamicProperty("nextLayAttempt", nextLayAttempt);
         }
 
         // Skip if not ready to lay (-1 indicates fresh spawn or not ready)
-        if (ticksUntilNextLay === CONFIG.INITIAL_TICKS_UNTIL_LAY) {
+        if (nextLayAttempt === CONFIG.INITIAL_TICKS_UNTIL_LAY) {
           let variant: ChickenVariantType;
           try {
             variant = getChickenVariant(entity);
@@ -89,16 +76,16 @@ export class ResourceLaying {
             continue;
           }
 
-          ticksUntilNextLay = getNextRandomSpawnTick(
+          nextLayAttempt = getNextRandomSpawnTick(
             variantData.minSpawnTick ?? CONFIG.DEFAULT_SPAWN_TICK_RANGE.MIN,
             variantData.maxSpawnTick ?? CONFIG.DEFAULT_SPAWN_TICK_RANGE.MAX
           );
-          entity.setDynamicProperty("ticksUntilNextLay", ticksUntilNextLay);
-          Logger.debug(`Set ticksUntilNextLay to ${ticksUntilNextLay} for chicken ${id}`);
+          entity.setDynamicProperty("nextLayAttempt", nextLayAttempt);
+          Logger.debug(`Set nextLayAttempt to ${nextLayAttempt} for chicken ${id}`);
           continue;
         }
 
-        if (currentTick < ticksUntilNextLay) continue;
+        if (currentTick < nextLayAttempt) continue;
 
         let variant: ChickenVariantType;
         try {
@@ -130,13 +117,19 @@ export class ResourceLaying {
           continue;
         }
 
-        // Reset ticksUntilNextLay for the next cycle
-        ticksUntilNextLay = getNextRandomSpawnTick(
-          variantData.minSpawnTick ?? CONFIG.DEFAULT_SPAWN_TICK_RANGE.MIN,
-          variantData.maxSpawnTick ?? CONFIG.DEFAULT_SPAWN_TICK_RANGE.MAX
-        );
-        entity.setDynamicProperty("ticksUntilNextLay", ticksUntilNextLay);
-        Logger.debug(`Updated ticksUntilNextLay to ${ticksUntilNextLay} for chicken ${id}`);
+        // Set nextLayAttempt for the next cycle set to -1 if baby chicken
+        if (entity.getDynamicProperty("isBaby") === true) {
+          nextLayAttempt = CONFIG.INITIAL_TICKS_UNTIL_LAY;
+        } else {
+          nextLayAttempt = getNextRandomSpawnTick(
+            variantData.minSpawnTick ?? CONFIG.DEFAULT_SPAWN_TICK_RANGE.MIN,
+            variantData.maxSpawnTick ?? CONFIG.DEFAULT_SPAWN_TICK_RANGE.MAX
+          );
+        }
+        
+        // Update the dynamic property for next lay attempt
+        entity.setDynamicProperty("nextLayAttempt", nextLayAttempt);
+        Logger.debug(`Updated nextLayAttempt to ${nextLayAttempt} for chicken ${id}`);
       }
     }, 1);
   }
