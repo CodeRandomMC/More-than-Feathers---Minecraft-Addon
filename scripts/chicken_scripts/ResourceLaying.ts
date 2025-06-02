@@ -65,7 +65,27 @@ export class ResourceLaying {
 
         if (currentTick < nextLayAttempt) continue;
 
-        // Lay resource
+        // Skip laying if this chicken is a baby
+        const isBaby = !!entity.getComponent?.("minecraft:is_baby");
+        if (isBaby) {
+          // Reset lay timer for babies so they will lay after growing up
+          entity.setDynamicProperty("nextLayAttempt", CONFIG.INITIAL_TICKS_UNTIL_LAY);
+          continue;
+        }
+
+        // Check if chunk is loaded before laying resource
+        let chunkLoaded = true;
+        try {
+          entity.dimension.getBlock(entity.location);
+        } catch {
+          chunkLoaded = false;
+        }
+        if (!chunkLoaded) {
+          Logger.debug(`Chunk not loaded for chicken ${id} at ${JSON.stringify(entity.location)}, skipping lay attempt.`);
+          continue;
+        }
+
+        // Lay resource (only once even if overdue)
         const itemId = getWeightedRandomItem(variantData.items);
         const itemStack = new ItemStack(itemId, 1);
 
@@ -78,9 +98,8 @@ export class ResourceLaying {
           continue;
         }
 
-        // Set nextLayAttempt for the next cycle; reset if baby
-        const isBaby = !!entity.getComponent?.("minecraft:is_baby");
-        const next = isBaby ? CONFIG.INITIAL_TICKS_UNTIL_LAY : getNextLayTick(variantData);
+        // Set nextLayAttempt for the next cycle
+        const next = getNextLayTick(variantData);
         entity.setDynamicProperty("nextLayAttempt", next);
         Logger.debug(`Updated nextLayAttempt to ${next} for chicken ${id}`);
       }
