@@ -118,7 +118,7 @@ export class ResourceLaying {
         }
 
         // Set nextLayAttempt for the next cycle set to -1 if baby chicken
-        if (entity.getDynamicProperty("isBaby") === true) {
+        if (entity.hasComponent("minecraft:is_baby") === true) {
           nextLayAttempt = CONFIG.INITIAL_TICKS_UNTIL_LAY;
         } else {
           nextLayAttempt = getNextRandomSpawnTick(
