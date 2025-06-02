@@ -10,7 +10,8 @@
       },
       "textures": {
         "base_variant": "textures/entity/resource_chicken/base_variant",
-        "stone_variant": "textures/entity/resource_chicken/stone_variant"
+        "stone_variant": "textures/entity/resource_chicken/stone_variant",
+        "zombie_variant": "textures/entity/resource_chicken/zombie_variant"
       },
       "geometry": {
         "default": "geometry.resource_chicken"

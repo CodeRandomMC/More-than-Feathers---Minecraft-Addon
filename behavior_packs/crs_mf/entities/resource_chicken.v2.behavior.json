@@ -29,30 +29,10 @@
           }
         }
       },
-      "crs_mf:resource_chicken_adult": {
-        "minecraft:spawn_entity": {
-          "entities": [
-            {
-              "filters": {
-                "test": "is_variant",
-                "value": 0
-              },
-              "min_wait_time": 300,
-              "max_wait_time": 600,
-              "spawn_item": "minecraft:egg",
-              "spawn_sound": "plop"
-            },
-            {
-              "filters": {
-                "test": "is_variant",
-                "value": 1
-              },
-              "min_wait_time": 300,
-              "max_wait_time": 600,
-              "spawn_item": "minecraft:stone",
-              "spawn_sound": "plop"
-            }
-          ]
+      "crs_mf:resource_chicken_adult": {},
+      "crs_mf:base_variant": {
+        "minecraft:variant": {
+          "value": 0
         },
         "minecraft:interact": {
           "interactions": [
@@ -63,6 +43,7 @@
                   "all_of": [
                     { "test": "is_variant", "subject": "self", "value": 0 },
                     { "test": "is_family", "subject": "other", "value": "player" },
+                    { "test": "is_baby", "subject": "self", "operator": "!=", "value": true },
                     { "test": "has_equipment", "subject": "other", "domain": "hand", "value": "crs_mf:stone_feed" }
                   ]
                 },
@@ -73,14 +54,14 @@
           ]
         }
       },
-      "crs_mf:base_variant": {
-        "minecraft:variant": {
-          "value": 0
-        }
-      },
       "crs_mf:stone_variant": {
         "minecraft:variant": {
           "value": 1
+        }
+      },
+      "crs_mf:zombie_variant": {
+        "minecraft:variant": {
+          "value": 2
         }
       }
     },
