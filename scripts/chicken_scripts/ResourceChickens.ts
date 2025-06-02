@@ -12,7 +12,7 @@ export class ResourceChickens {
    * Static map storing chicken cache entries, keyed by entity ID.
    * Accessible via ResourceChickens.chickenCache across modules.
    */
-  static chickenCache: Map<string, ChickenCacheEntry> = new Map<string, ChickenCacheEntry>();
+  static chickenCache = new Map<string, ChickenCacheEntry>();
 
   constructor() {
     Logger.setDebug(true);

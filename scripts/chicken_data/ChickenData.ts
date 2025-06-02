@@ -34,9 +34,8 @@ export function getChickenVariant(entity: Entity): ChickenVariantType {
 
   if (minecraftVariant === undefined) {
     throw new Error(`Entity ${entity.id} has no variant, defaulting to Base.`);
-  } else {
-    return minecraftVariant as ChickenVariantType; // Cast to ChickenVariantType
   }
+  return minecraftVariant as ChickenVariantType; // Cast to ChickenVariantType
 }
 
 export function getChickenVariantData(entity: Entity): ChickenVariant {
