@@ -1,4 +1,4 @@
-import { world, system, Entity } from "@minecraft/server";
+import { world,  Entity } from "@minecraft/server";
 import { ResourceChickens } from "./ResourceChickens";
 import { Logger } from "../utils/CRSLogger";
 
@@ -31,18 +31,21 @@ export class ChickenCacheManager {
       }
 
       // Initialize nextLayAttempt if not set (fresh spawn)
-      const currentNextLayAttempt = entity.getDynamicProperty("nextLayAttempt") as number | undefined;
-      if (currentNextLayAttempt === undefined) {
+      const currentNextLayAttempt = entity.getDynamicProperty("nextLayAttempt");
+      if (typeof currentNextLayAttempt !== "number") {
         entity.setDynamicProperty("nextLayAttempt", CONFIG.INITIAL_TICKS_UNTIL_LAY);
         Logger.debug(`Initialized nextLayAttempt to ${CONFIG.INITIAL_TICKS_UNTIL_LAY} for chicken ${entity.id}`);
       }
 
-      ResourceChickens.chickenCache.set(entity.id, { entity });
-      Logger.debug(`Added chicken ${entity.id} to cache`);
+      if (!ResourceChickens.chickenCache.has(entity.id)) {
+        ResourceChickens.chickenCache.set(entity.id, { entity });
+        Logger.debug(`Added chicken ${entity.id} to cache`);
+      }
     };
 
-    world.afterEvents.entityLoad.subscribe(({ entity }) => handleEntityAdd(entity));
-    world.afterEvents.entitySpawn.subscribe(({ entity }) => handleEntityAdd(entity));
+    [world.afterEvents.entityLoad, world.afterEvents.entitySpawn].forEach(event =>
+      event.subscribe(({ entity }) => handleEntityAdd(entity))
+    );
 
     world.beforeEvents.entityRemove.subscribe(({ removedEntity: entity }) => {
       if (entity.typeId !== this.chickenTypeId) return;
