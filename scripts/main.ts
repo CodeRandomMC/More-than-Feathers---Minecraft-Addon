@@ -1,4 +1,3 @@
-import { world, system, EntitySpawnAfterEvent, EntityInitializationCause } from "@minecraft/server";
-import { ResourceLayingManager } from "./chicken_scripts/ResourceLaying";
+import { ResourceChickens } from "./chicken_scripts/ResourceChickens";
 
-new ResourceLayingManager();
+new ResourceChickens();
