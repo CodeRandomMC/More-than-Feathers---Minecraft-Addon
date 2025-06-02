@@ -48,7 +48,7 @@ export class ResourceLaying {
       const currentTick = system.currentTick;
 
       for (const [id, { entity }] of ResourceChickens.chickenCache.entries()) {
-        if (entity.typeId !== CONFIG.CHICKEN_TYPE_ID) {
+        if (entity.typeId !== CONFIG.CHICKEN_TYPE_ID || !entity.isValid) { // v2.0.0 use EntityLifetimeState.loaded as isValid
           Logger.warn(`Invalid entity type ${entity.typeId} in cache for ID ${id}`);
           continue;
         }
