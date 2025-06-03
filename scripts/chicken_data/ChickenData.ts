@@ -117,16 +117,6 @@ export class ChickenData {
   }
 
   /**
-   * Makes the chicken an adult (removes baby status).
-   */
-  makeAdult() {
-    const isBabyComp = this.entity.getComponent("minecraft:is_baby");
-    if (isBabyComp && isBabyComp.isValid) {
-      this.isBaby = false;
-    }
-  }
-
-  /**
    * Refreshes all properties from the entity (useful after external changes).
    */
   refresh() {
@@ -146,6 +136,57 @@ export class ChickenData {
     const healthComp = this.entity.getComponent("minecraft:health");
     this.health = healthComp ? (healthComp as any).current : undefined;
     this.maxHealth = healthComp ? (healthComp as any).value : undefined;
+  }
+
+  /**
+   * Handles the resource laying for this chicken.
+   * Spawns the item, particle, and sound, and resets the next lay attempt.
+   */
+  layResources() {
+    if (this.isBaby) return;
+    // Pick a random item to lay
+    const getWeightedRandomItem = require("../utils/RandomUtils").getWeightedRandomItem;
+    const getNextRandomSpawnTick = require("../utils/TickUtils").getNextRandomSpawnTick;
+    const Logger = require("../utils/CRSLogger").Logger;
+    const itemId = getWeightedRandomItem(this.items, (item: any) => item.itemId);
+    const ItemStack = require("@minecraft/server").ItemStack;
+    const itemStack = new ItemStack(itemId, 1);
+    try {
+      this.entity.dimension.spawnItem(itemStack, this.entity.location);
+      this.entity.dimension.spawnParticle("minecraft:crop_growth_emitter", this.entity.location);
+      this.entity.dimension.playSound?.("mob.chicken.plop", this.entity.location, { volume: 1, pitch: 1 });
+    } catch (e) {
+      Logger.debug(
+        `Failed to spawn item for chicken ${this.entity.id} at ${JSON.stringify(this.entity.location)}: ${e}`
+      );
+    }
+    // Reset next lay attempt
+    const next = getNextRandomSpawnTick(this.minSpawnTick, this.maxSpawnTick);
+    this.setNextLayAttempt(next);
+    Logger.debug(`Reset nextLayAttempt countdown to ${next} for chicken ${this.entity.id}`);
+  }
+
+  /**
+   * Feeds the chicken: increases saturation, heals, and plays effects.
+   * Returns true if feeding was successful.
+   */
+  feed(amount: number = 100, healAmount: number = 2): boolean {
+    if (this.isBaby) return false;
+    if (this.saturation >= 100) return false;
+    // Increase saturation
+    this.setSaturation(Math.min(100, this.saturation + amount));
+    // Heal if not at max health
+    if (this.health !== undefined && this.maxHealth !== undefined && this.health < this.maxHealth) {
+      this.heal(healAmount);
+    }
+    // Play eat sound and particle
+    try {
+      this.entity.dimension.spawnParticle?.("crs_mf:chicken_eat", this.entity.location);
+      this.entity.dimension.playSound?.("mob.chicken.eat", this.entity.location, { volume: 1, pitch: 1 });
+    } catch (e) {
+      // Ignore errors for effects
+    }
+    return true;
   }
 }
 

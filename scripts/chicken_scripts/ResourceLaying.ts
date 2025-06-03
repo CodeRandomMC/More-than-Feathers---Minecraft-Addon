@@ -27,7 +27,6 @@ export class ResourceLaying {
    */
   private handleLaying(): void {
     system.runInterval(() => {
-      const currentTick = system.currentTick;
       const overworld = world.getDimension("overworld");
       const chickens = overworld.getEntities({ type: CONFIG.CHICKEN_TYPE_ID });
       for (const entity of chickens) {
@@ -58,18 +57,8 @@ export class ResourceLaying {
           chickenData.setNextLayAttempt(countdown);
           continue;
         }
-        const itemId = getWeightedRandomItem(chickenData.items, (item) => item.itemId);
-        const itemStack = new ItemStack(itemId, 1);
-        try {
-          entity.dimension.spawnItem(itemStack, entity.location);
-          entity.dimension.spawnParticle("minecraft:crop_growth_emitter", entity.location);
-          entity.dimension.playSound?.("mob.chicken.plop", entity.location, { volume: 1, pitch: 1 });
-        } catch (e) {
-          Logger.debug(`Failed to spawn item for chicken ${id} at ${JSON.stringify(entity.location)}: ${e}`);
-        }
-        const next = getNextRandomSpawnTick(chickenData.minSpawnTick, chickenData.maxSpawnTick);
-        chickenData.setNextLayAttempt(next);
-        Logger.debug(`Reset nextLayAttempt countdown to ${next} for chicken ${id}`);
+        // Use the new layResources method
+        chickenData.layResources();
       }
     }, CONFIG.LAY_CHECK_INTERVAL);
   }

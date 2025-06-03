@@ -57,7 +57,8 @@ export class BaseChickenHandler {
             player.getComponent("minecraft:inventory")?.container.setItem(feedIndex, undefined);
           }
         }
-        chickenData.setSaturation(100);
+        // Use the new feed method
+        chickenData.feed();
       }
     });
   }
