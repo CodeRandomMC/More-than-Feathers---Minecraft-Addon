@@ -4,7 +4,7 @@
  */
 import { EquipmentSlot, ItemStack, PlayerInteractWithEntityAfterEvent, world } from "@minecraft/server";
 import { Logger } from "../utils/CRSLogger";
-import { getChickenData, ChickenData } from "../chicken_data/ChickenData";
+import { getResourceChicken, ResourceChicken } from "../chicken_data/ResourceChicken";
 
 Logger.debug("BaseChickenHandler script loaded.");
 
@@ -26,10 +26,10 @@ export class BaseChickenHandler {
       const player = event.player;
       const entity = event.target;
 
-      let chickenData: ChickenData | undefined = undefined;
+      let chickenData: ResourceChicken | undefined = undefined;
       if (entity.typeId === "crs_mf:resource_chicken") {
         try {
-          chickenData = getChickenData(entity);
+          chickenData = getResourceChicken(entity);
         } catch (e) {
           Logger.warn(`Failed to get chicken data: ${e}`);
         }

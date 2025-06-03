@@ -29,7 +29,7 @@ export interface ChickenVariant {
 /**
  * Stores and manages all data for a single chicken entity.
  */
-export class ChickenData {
+export class ResourceChicken {
   private entity: Entity;
   public variant: ChickenVariantType;
   public items: ItemDrop[];
@@ -230,6 +230,6 @@ export function getChickenVariantData(entity: Entity): ChickenVariant {
  * @param entity The chicken entity.
  * @returns The ChickenData instance.
  */
-export function getChickenData(entity: Entity): ChickenData {
-  return new ChickenData(entity);
+export function getResourceChicken(entity: Entity): ResourceChicken {
+  return new ResourceChicken(entity);
 }

@@ -3,7 +3,7 @@
  * @module chicken_scripts/ResourceLaying
  */
 import { system, ItemStack, Entity, world } from "@minecraft/server";
-import { getChickenData, ChickenData } from "../chicken_data/ChickenData";
+import { getResourceChicken, ResourceChicken } from "../chicken_data/ResourceChicken";
 import { Logger } from "../utils/CRSLogger";
 import { getWeightedRandomItem, hashString } from "../utils/RandomUtils";
 import { getNextRandomSpawnTick } from "../utils/TickUtils";
@@ -36,14 +36,16 @@ export class ResourceLaying {
         const offset = hashString(id) % CONFIG.LAY_CHECK_INTERVAL;
         if ((system.currentTick + offset) % CONFIG.LAY_CHECK_INTERVAL !== 0) continue;
 
-        let chickenData: ChickenData | undefined = undefined;
-        try {
-          chickenData = getChickenData(entity);
-        } catch (e) {
-          Logger.warn(`Failed to get chicken data for chicken ${id}: ${e}`);
-          continue;
+        let chickenData: ResourceChicken | undefined = undefined;
+        if (entity.typeId === CONFIG.CHICKEN_TYPE_ID) {
+          try {
+            chickenData = getResourceChicken(entity);
+          } catch (e) {
+            Logger.warn(`Failed to get chicken data for chicken ${id}: ${e}`);
+            continue;
+          }
         }
-
+        if (!chickenData) continue;
         let countdown = chickenData.nextLayAttempt;
         if (typeof countdown !== "number" || countdown <= 0) {
           const next = getNextRandomSpawnTick(chickenData.minSpawnTick, chickenData.maxSpawnTick);

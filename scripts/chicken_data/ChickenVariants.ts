@@ -3,7 +3,7 @@
  * @module chicken_data/ChickenVariants
  */
 import { MinecraftItemTypes } from "@minecraft/vanilla-data";
-import { ChickenVariantType, ChickenVariant } from "./ChickenData";
+import { ChickenVariantType, ChickenVariant, ResourceChicken } from "./ResourceChicken";
 
 /**
  * Maps each ChickenVariantType to its drop and spawn data.
