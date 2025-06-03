@@ -3,28 +3,15 @@
  * @module chicken_scripts/ResourceLaying
  */
 import { system, ItemStack, Entity, world } from "@minecraft/server";
-import {
-  ChickenVariantType,
-  ItemDrop,
-  getChickenVariant,
-  getChickenData,
-  ChickenData,
-} from "../chicken_data/ChickenData";
+import { getChickenData, ChickenData } from "../chicken_data/ChickenData";
 import { Logger } from "../utils/CRSLogger";
 import { getWeightedRandomItem, hashString } from "../utils/RandomUtils";
+import { getNextRandomSpawnTick } from "../utils/TickUtils";
 
 const CONFIG = {
   CHICKEN_TYPE_ID: "crs_mf:resource_chicken",
-  PROPERTY_NEXT_LAY_ATTEMPT: "crs_mf:next_lay_attempt",
-  DEFAULT_SPAWN_TICK_RANGE: { MIN: 300, MAX: 600 },
   LAY_CHECK_INTERVAL: 10,
 } as const;
-
-function getNextLayCountdown(variantData: any): number {
-  const min = variantData.minSpawnTick ?? CONFIG.DEFAULT_SPAWN_TICK_RANGE.MIN;
-  const max = variantData.maxSpawnTick ?? CONFIG.DEFAULT_SPAWN_TICK_RANGE.MAX;
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
 
 /**
  * Class responsible for handling the periodic resource laying of chickens.
@@ -50,26 +37,19 @@ export class ResourceLaying {
         const offset = hashString(id) % CONFIG.LAY_CHECK_INTERVAL;
         if ((system.currentTick + offset) % CONFIG.LAY_CHECK_INTERVAL !== 0) continue;
 
-        let countdown = entity.getDynamicProperty(CONFIG.PROPERTY_NEXT_LAY_ATTEMPT) as number;
-        if (typeof countdown !== "number" || countdown <= 0) {
-          let chickenData: ReturnType<typeof getChickenData> | undefined = undefined;
-          try {
-            chickenData = getChickenData(entity);
-          } catch (e) {
-            Logger.warn(`Failed to get chicken data for chicken ${id}: ${e}`);
-            continue;
-          }
-          const next = getNextLayCountdown(chickenData);
-          entity.setDynamicProperty(CONFIG.PROPERTY_NEXT_LAY_ATTEMPT, next);
-          Logger.debug(`Set nextLayAttempt countdown to ${next} for chicken ${id}`);
-          continue;
-        }
-
         let chickenData: ChickenData | undefined = undefined;
         try {
           chickenData = getChickenData(entity);
         } catch (e) {
           Logger.warn(`Failed to get chicken data for chicken ${id}: ${e}`);
+          continue;
+        }
+
+        let countdown = chickenData.nextLayAttempt;
+        if (typeof countdown !== "number" || countdown <= 0) {
+          const next = getNextRandomSpawnTick(chickenData.minSpawnTick, chickenData.maxSpawnTick);
+          chickenData.setNextLayAttempt(next);
+          Logger.debug(`Set nextLayAttempt countdown to ${next} for chicken ${id}`);
           continue;
         }
         if (chickenData.isBaby) continue;
@@ -87,7 +67,7 @@ export class ResourceLaying {
         } catch (e) {
           Logger.debug(`Failed to spawn item for chicken ${id} at ${JSON.stringify(entity.location)}: ${e}`);
         }
-        const next = getNextLayCountdown(chickenData);
+        const next = getNextRandomSpawnTick(chickenData.minSpawnTick, chickenData.maxSpawnTick);
         chickenData.setNextLayAttempt(next);
         Logger.debug(`Reset nextLayAttempt countdown to ${next} for chicken ${id}`);
       }
