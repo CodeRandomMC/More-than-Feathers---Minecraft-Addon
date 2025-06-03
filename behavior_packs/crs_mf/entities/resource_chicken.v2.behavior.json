@@ -14,7 +14,9 @@
         },
         "crs_mf:next_lay_attempt": {
           "type": "int",
-          "default": -1
+          "default": 300,
+          "range": [0, 60000],
+          "client_sync": true
         }
       }
     },

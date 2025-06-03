@@ -7,7 +7,6 @@ import { getNextRandomSpawnTick } from "../utils/TickUtils";
 const CONFIG = {
   CHICKEN_TYPE_ID: "crs_mf:resource_chicken",
   PROPERTY_NEXT_LAY_ATTEMPT: "crs_mf:next_lay_attempt",
-  INITIAL_TICKS_UNTIL_LAY: -1,
   DEFAULT_SPAWN_TICK_RANGE: { MIN: 300, MAX: 600 },
   LAY_CHECK_INTERVAL: 10, // Configurable interval
 } as const;
@@ -22,11 +21,10 @@ function getWeightedRandomItem(items: ItemDrop[]): string {
   return items[0].itemId;
 }
 
-function getNextLayTick(variantData: any): number {
-  return getNextRandomSpawnTick(
-    variantData.minSpawnTick ?? CONFIG.DEFAULT_SPAWN_TICK_RANGE.MIN,
-    variantData.maxSpawnTick ?? CONFIG.DEFAULT_SPAWN_TICK_RANGE.MAX
-  );
+function getNextLayCountdown(variantData: any): number {
+  const min = variantData.minSpawnTick ?? CONFIG.DEFAULT_SPAWN_TICK_RANGE.MIN;
+  const max = variantData.maxSpawnTick ?? CONFIG.DEFAULT_SPAWN_TICK_RANGE.MAX;
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 function hashString(str: string): number {
@@ -56,10 +54,41 @@ export class ResourceLaying {
         // Spread out checks using hash offset
         const id = entity.id ?? (entity as any).uniqueId ?? JSON.stringify(entity.location);
         const offset = hashString(id) % CONFIG.LAY_CHECK_INTERVAL;
-        if ((currentTick + offset) % CONFIG.LAY_CHECK_INTERVAL !== 0) continue;
+        if ((system.currentTick + offset) % CONFIG.LAY_CHECK_INTERVAL !== 0) continue;
 
-        let nextLayAttempt = entity.getDynamicProperty(CONFIG.PROPERTY_NEXT_LAY_ATTEMPT) as number;
+        let countdown = entity.getDynamicProperty(CONFIG.PROPERTY_NEXT_LAY_ATTEMPT) as number;
+        if (typeof countdown !== "number" || countdown <= 0) {
+          // Set initial countdown if not set or expired
+          let variant: ChickenVariantType;
+          let variantData: (typeof ChickenVariants)[keyof typeof ChickenVariants];
+          try {
+            variant = getChickenVariant(entity);
+            variantData = ChickenVariants[variant];
+            if (!variantData) throw new Error(`Unknown variant ${variant}`);
+          } catch (e) {
+            Logger.warn(`Failed to get variant for chicken ${id}: ${e}`);
+            continue;
+          }
+          const next = getNextLayCountdown(variantData);
+          entity.setDynamicProperty(CONFIG.PROPERTY_NEXT_LAY_ATTEMPT, next);
+          Logger.debug(`Set nextLayAttempt countdown to ${next} for chicken ${id}`);
+          continue;
+        }
 
+        // Skip laying if this chicken is a baby
+        const isBaby = !!entity.getComponent?.("minecraft:is_baby");
+        if (isBaby) {
+          continue;
+        }
+
+        // Decrement countdown
+        countdown -= CONFIG.LAY_CHECK_INTERVAL;
+        if (countdown > 0) {
+          entity.setDynamicProperty(CONFIG.PROPERTY_NEXT_LAY_ATTEMPT, countdown);
+          continue;
+        }
+
+        // Lay resource
         let variant: ChickenVariantType;
         let variantData: (typeof ChickenVariants)[keyof typeof ChickenVariants];
         try {
@@ -70,39 +99,19 @@ export class ResourceLaying {
           Logger.warn(`Failed to get variant for chicken ${id}: ${e}`);
           continue;
         }
-
-        if (nextLayAttempt === CONFIG.INITIAL_TICKS_UNTIL_LAY) {
-          const next = getNextLayTick(variantData);
-          entity.setDynamicProperty(CONFIG.PROPERTY_NEXT_LAY_ATTEMPT, next);
-          Logger.debug(`Set nextLayAttempt to ${next} for chicken ${id}`);
-          continue;
-        }
-
-        if (currentTick < nextLayAttempt) continue;
-
-        // Skip laying if this chicken is a baby
-        const isBaby = !!entity.getComponent?.("minecraft:is_baby");
-        if (isBaby) {
-          continue;
-        }
-
-        // Lay resource (only once even if overdue)
         const itemId = getWeightedRandomItem(variantData.items);
         const itemStack = new ItemStack(itemId, 1);
-
         try {
           entity.dimension.spawnItem(itemStack, entity.location);
           entity.dimension.spawnParticle("minecraft:crop_growth_emitter", entity.location);
           entity.dimension.playSound?.("mob.chicken.plop", entity.location, { volume: 1, pitch: 1 });
         } catch (e) {
           Logger.debug(`Failed to spawn item for chicken ${id} at ${JSON.stringify(entity.location)}: ${e}`);
-          // Even if it fails, just schedule the next lay attempt as normal
         }
-
-        // Always set up the next lay attempt, regardless of success
-        const next = getNextLayTick(variantData);
+        // Reset countdown
+        const next = getNextLayCountdown(variantData);
         entity.setDynamicProperty(CONFIG.PROPERTY_NEXT_LAY_ATTEMPT, next);
-        Logger.debug(`Updated nextLayAttempt to ${next} for chicken ${id}`);
+        Logger.debug(`Reset nextLayAttempt countdown to ${next} for chicken ${id}`);
       }
     }, CONFIG.LAY_CHECK_INTERVAL); // Use configurable interval
   }
