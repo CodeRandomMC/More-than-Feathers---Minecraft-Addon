@@ -1,36 +1,36 @@
 {
-	"format_version": 2,
-	"header": {
-		"name": "More than Feathers",
-		"description": "TypeScript Starter",
-		"uuid": "7fb659e3-4a30-42af-9dd5-7f0307ff71cb",
-		"version": [1, 0, 0],
-		"min_engine_version": [1, 21, 80]
-	},
-	"modules": [
-		{
-			"description": "Script resources",
-			"language": "javascript",
-			"type": "script",
-			"uuid": "7b651f6e-3271-4607-8045-27fc363eec7e",
-			"version": [1, 0, 0],
-			"entry": "scripts/main.js"
-		}
-	],
-	"dependencies": [
-		{
-			"module_name": "@minecraft/server",
-			"version": "1.19.0"
-		},
-		{
-			"uuid": "250dc380-4bab-4a32-b40d-3abcf1528e54",
-			"version": [1, 0, 0]
-		}
-	],
-	"metadata": {
-		"generated_with": {
-			"mctoolsweb": ["0.11.1"],
-			"blockbench_entity_wizard": ["1.7.0"]
-		}
-	}
+  "format_version": 2,
+  "header": {
+    "name": "More than Feathers",
+    "description": "TypeScript Starter",
+    "uuid": "7fb659e3-4a30-42af-9dd5-7f0307ff71cb",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 21, 80]
+  },
+  "modules": [
+    {
+      "description": "Script resources",
+      "language": "javascript",
+      "type": "script",
+      "uuid": "7b651f6e-3271-4607-8045-27fc363eec7e",
+      "version": [1, 0, 0],
+      "entry": "scripts/main.js"
+    }
+  ],
+  "dependencies": [
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.0.0-beta"
+    },
+    {
+      "uuid": "250dc380-4bab-4a32-b40d-3abcf1528e54",
+      "version": [1, 0, 0]
+    }
+  ],
+  "metadata": {
+    "generated_with": {
+      "mctoolsweb": ["0.11.1"],
+      "blockbench_entity_wizard": ["1.7.0"]
+    }
+  }
 }
