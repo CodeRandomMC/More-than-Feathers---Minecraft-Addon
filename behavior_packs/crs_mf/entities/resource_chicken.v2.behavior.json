@@ -11,6 +11,10 @@
           "range": [0, 100],
           "default": 50,
           "client_sync": true
+        },
+        "crs_mf:next_lay_attempt": {
+          "type": "int",
+          "default": -1
         }
       }
     },
