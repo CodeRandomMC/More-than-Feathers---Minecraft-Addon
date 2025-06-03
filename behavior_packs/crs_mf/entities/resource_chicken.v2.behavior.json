@@ -64,7 +64,15 @@
       }
     },
     "components": {
-      "minecraft:physics": {}
+      "minecraft:physics": {},
+      "minecraft:timer": {
+        "looping": true,
+        "time": 1200,
+        "time_down_event": {
+          "event": "crs_mf:decrease_saturation",
+          "target": "self"
+        }
+      }
     },
     "events": {
       "crs_mf:age_up": {
@@ -127,6 +135,11 @@
       },
       "crs_mf:debug_interact": {
         "sequence": []
+      },
+      "crs_mf:decrease_saturation": {
+        "set_property": {
+          "crs_mf:saturation": "max(0, query.property('crs_mf:saturation') - 1)"
+        }
       }
     }
   }
