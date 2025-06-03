@@ -1,4 +1,12 @@
+/**
+ * Logger utility for the More Than Feathers addon.
+ * Provides static logging methods with optional debug mode.
+ * @module utils/CRSLogger
+ */
 export class Logger {
+  /**
+   * Logger class for standardized logging with debug toggle.
+   */
   static readonly TAG = "[More than Feathers]";
   static debugEnabled = false;
 

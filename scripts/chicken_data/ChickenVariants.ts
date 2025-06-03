@@ -1,6 +1,13 @@
+/**
+ * Chicken variant data for all resource chicken types.
+ * @module chicken_data/ChickenVariants
+ */
 import { MinecraftItemTypes } from "@minecraft/vanilla-data";
 import { ChickenVariantType, ChickenVariant } from "./ChickenData";
 
+/**
+ * Maps each ChickenVariantType to its drop and spawn data.
+ */
 export const ChickenVariants: Record<ChickenVariantType, ChickenVariant> = {
   [ChickenVariantType.Base]: {
     items: [

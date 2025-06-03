@@ -35,29 +35,21 @@
           }
         }
       },
-      "crs_mf:resource_chicken_adult": {},
-      "crs_mf:base_variant": {
-        "minecraft:variant": {
-          "value": 0
-        },
+      "crs_mf:resource_chicken_adult": {
         "minecraft:interact": {
           "interactions": [
             {
-              "use_item": true,
               "on_interact": {
-                "filters": {
-                  "all_of": [
-                    { "test": "is_variant", "subject": "self", "value": 0 },
-                    { "test": "is_family", "subject": "other", "value": "player" },
-                    { "test": "is_baby", "subject": "self", "operator": "!=", "value": true },
-                    { "test": "has_equipment", "subject": "other", "domain": "hand", "value": "crs_mf:stone_feed" }
-                  ]
-                },
-                "event": "crs_mf:transform_to_stone",
+                "event": "crs_mf:debug_interact",
                 "target": "self"
               }
             }
           ]
+        }
+      },
+      "crs_mf:base_variant": {
+        "minecraft:variant": {
+          "value": 0
         }
       },
       "crs_mf:stone_variant": {
@@ -132,6 +124,9 @@
         "add": {
           "component_groups": ["crs_mf:resource_chicken_baby"]
         }
+      },
+      "crs_mf:debug_interact": {
+        "sequence": []
       }
     }
   }
