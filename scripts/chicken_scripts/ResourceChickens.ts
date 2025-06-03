@@ -7,12 +7,6 @@ import { ResourceLaying } from "./ResourceLaying";
  * accessible to other modules in the mod.
  */
 export class ResourceChickens {
-  /**
-   * Static map storing chicken cache entries, keyed by entity ID.
-   * Accessible via ResourceChickens.chickenCache across modules.
-   */
-  static chickenCache = new Map<string, ChickenCacheEntry>();
-
   constructor() {
     Logger.setDebug(true);
     Logger.debug("Starting More than Feathers scripts...");
