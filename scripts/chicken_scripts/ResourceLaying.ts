@@ -7,12 +7,9 @@ import { getNextRandomSpawnTick } from "../utils/TickUtils";
 const CONFIG = {
   CHICKEN_TYPE_ID: "crs_mf:resource_chicken",
   PROPERTY_NEXT_LAY_ATTEMPT: "crs_mf:next_lay_attempt",
-  DEFAULT_SPAWN_TICK_RANGE: { MIN: 300, MAX: 600 },
   INITIAL_TICKS_UNTIL_LAY: -1,
+  DEFAULT_SPAWN_TICK_RANGE: { MIN: 300, MAX: 600 },
   LAY_CHECK_INTERVAL: 10, // Configurable interval
-  MAX_LAY_RETRIES: 5, // Max retries for failed lays
-  RETRY_BACKOFF_BASE: 20, // Base ticks for backoff
-  PLAYER_RADIUS: 16, // Only lay if player is within this radius
 } as const;
 
 function getWeightedRandomItem(items: ItemDrop[]): string {
@@ -86,7 +83,6 @@ export class ResourceLaying {
         // Skip laying if this chicken is a baby
         const isBaby = !!entity.getComponent?.("minecraft:is_baby");
         if (isBaby) {
-          entity.setDynamicProperty(CONFIG.PROPERTY_NEXT_LAY_ATTEMPT, CONFIG.INITIAL_TICKS_UNTIL_LAY);
           continue;
         }
 
