@@ -1,5 +1,4 @@
 import { Logger } from "../utils/CRSLogger";
-import { ChickenCacheManager } from "./ChickenCacheManager";
 import { ChickenCacheEntry } from "../chicken_data/ChickenData";
 import { ResourceLaying } from "./ResourceLaying";
 
@@ -17,7 +16,6 @@ export class ResourceChickens {
   constructor() {
     Logger.setDebug(true);
     Logger.debug("Starting More than Feathers scripts...");
-    new ChickenCacheManager();
     new ResourceLaying();
   }
 }
